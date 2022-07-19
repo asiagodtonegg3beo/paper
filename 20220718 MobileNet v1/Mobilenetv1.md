@@ -12,7 +12,7 @@
 * 將標準卷積拆分為深度卷積(depthwise convolution)和逐點卷積(pointwise convolution)兩個操作
 * 對每個input channel採用不同的kernel，就是說一個kernel對應一個input channel，所以說depthwise convolution對depth做操作
 
-![](assets/markdown-img-paste-20220718160759692.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220718160759692.png)
 
 ##### 分析：
 ##### 採用standard convolution
@@ -38,7 +38,7 @@ $D_K$ 是 kernel 的大小
 
 兩種方法計算量相比，通常N的取值較大可忽略，如果kernel size = 3 x 3，後者可以減少9倍運算量
 
-![](assets/markdown-img-paste-2022071816523292.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-2022071816523292.png)
 
 #### 舉例：
 
@@ -46,20 +46,20 @@ $D_K$ 是 kernel 的大小
 * 假設input 的尺寸為 32 * 32 * 2 的照片，透過傳統的 Convolution 使得其輸出為一個尺寸為 32 * 32 * 3 的 feature map
 * 而為了達到這個目的 kernel size 為 K * K * 2 * 3 (3 個 K * K * 2 的 kernel)，而每個 kernel 對input 做完 convolution 之後會得到 output 的一層 channel feature map，如下圖：
 
-![](assets/markdown-img-paste-20220718172023996.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220718172023996.png)
 
 ##### depthwise separable convolution：
 
 * 對於 Input 中的每層 channel(depth) 各自做 Convolution，
 32 * 32 * 2 的 Input，切割成了兩個 32 * 32 * 1的 Input，切割之後原先我們尺寸為 K * K * 2 的 Kernel 可以簡化為 K * K * 1的尺寸
 
-![](assets/markdown-img-paste-20220718171921559.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220718171921559.png)
 
 ##### 1×1 convolution (pointwise convolution)：
 
 * 經過 Depthwise convolution 的 output feature map 32 * 32 * 2，我們利用了 3 個 1 * 1 * 2 的 kernel 進行 convolution 後可以得到一個尺寸為 32 * 32 * 3 的 output feature map
 
-![](assets/markdown-img-paste-20220718172726787.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220718172726787.png)
 
 ##### 運算量比較
 
@@ -90,17 +90,17 @@ $=K * K * 2 * 32 * 32 + 3 * 2 * 32 * 32 = 2048 * K^2 + 6144$
 
 與標準卷積結構相比多加了Depthwise 、 BN以及ReLU layer
 
-![](assets/markdown-img-paste-20220719144109173.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220719144109173.png)
 
 MobileNet除了第一層採用的是標準卷積核之外，剩下的捲積層都用的是Depth wise Separable Convolution
 
-![](assets/markdown-img-paste-20220719144540922.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220719144540922.png)
 
 * 矩陣乘法一般是使用 GEMM (General Matrix Multiply Functions) 的方法進行計算，但是在進行卷積前要先使用im2col的方法對原來的Kernel和輸入重新進行排序才可以進行矩陣乘法
 * 如果使用 1 x 1 的Kernel就不需要重新排序
 * MobileNet花費在計算上的時間佔了 95% 和 74.59% 的 parameter 集中在 1 x 1 的捲積層上，而且幾乎另外的參數也都在全連接層(FC)上
 
-![](assets/markdown-img-paste-20220719144907338.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220719144907338.png)
 
 ##### Width Multiplier：寬度變薄
 
@@ -122,13 +122,13 @@ $D_K * D_K * α * M * ρ * D_F * ρ * D_F + α * M * α * N * ρ * D_F * ρ * D_
 >feature map size：14x14x512 <br>
 >Kernel K size：3x3x512x512 <br>
 
-![](assets/markdown-img-paste-20220719153241910.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220719153241910.png)
 
 ### 實驗
 
 ImageNet 的表現上，相比於 GoogleNet 以及 VGG16 ， MobilenetV1 可以在差不多的準確度的情況下，大幅的降低運算量以及參數量
 
-![](assets/markdown-img-paste-20220719160934666.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220719160934666.png)
 
 
 調整解析度的影響較小，調整寬度影響較大。
@@ -138,15 +138,15 @@ ImageNet 的表現上，相比於 GoogleNet 以及 VGG16 ， MobilenetV1 可以�
 > resolution ∈ {224,192,160,128} <br>
 
 
-![](assets/markdown-img-paste-20220719161549168.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220719161549168.png)
 
-![](assets/markdown-img-paste-20220719160753806.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220719160753806.png)
 
 ### 應用
 
  在 object detection 上，作者將 MobileNet 套用在 SSD、faster-RCNN 等著名的物件偵測架構上，發現 mobileNet 可以與這些物件偵測架構搭配，取得良好的準確度以及驚人的小運算量。
 
-![](assets/markdown-img-paste-20220719161707963.png)
+![](https://raw.githubusercontent.com/asiagodtonegg3beo/paper/main/20220718%20MobileNet%20v1/assets/markdown-img-paste-20220719161707963.png)
 
 在 face recognition 的題目上，MobileNet 也可以取得很好的表現，作者利用蒸餾 (distillation) 的方法，將 MobileNet 的輸出擬和至 pretrained FaceNet 的輸出。
 
